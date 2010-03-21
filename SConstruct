@@ -789,7 +789,7 @@ def doConfigure( myenv , needJava=True , needPcre=True , shell=False ):
 
     if usesm:
 
-        myCheckLib( [ "mozjs" , "libjs, "js", "js_static" ] , True )
+        myCheckLib( [ "mozjs" , "libjs", "js", "js_static" ] , True )
         mozHeader = "js"
         if bigLibString(myenv).find( "mozjs" ) >= 0:
             mozHeader = "mozjs"
