@@ -1,4 +1,5 @@
 
+import hacks_mandriva
 import hacks_ubuntu
 import os;
 
