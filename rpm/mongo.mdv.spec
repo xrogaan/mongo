@@ -53,26 +53,26 @@ scons --prefix=$RPM_BUILD_ROOT/usr all
 # XXX really should have shared library here
 
 %install
-scons --prefix=$RPM_BUILD_ROOT/usr install
-mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
-cp debian/*.1 $RPM_BUILD_ROOT/usr/share/man/man1/
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
-cp rpm/init.d-mongod $RPM_BUILD_ROOT/etc/rc.d/init.d/mongod
-chmod a+x $RPM_BUILD_ROOT/etc/rc.d/init.d/mongod
-mkdir -p $RPM_BUILD_ROOT/etc
-cp rpm/mongod.conf $RPM_BUILD_ROOT/etc/mongod.conf
-mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
-cp rpm/mongod.sysconfig $RPM_BUILD_ROOT/etc/sysconfig/mongod
-mkdir -p $RPM_BUILD_ROOT/var/lib/mongo
-mkdir -p $RPM_BUILD_ROOT/var/log/mongo
-touch $RPM_BUILD_ROOT/var/log/mongo/mongod.log
+scons --prefix=$RPM_BUILD_ROOT%{_usr} install
+mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
+cp debian/*.1 $RPM_BUILD_ROOT%{_mandir}/man1/
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
+cp rpm/init.d-mongod $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d/mongod
+chmod a+x $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d/mongod
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}
+cp rpm/mongod.conf $RPM_BUILD_ROOT%{_sysconfdir}/mongod.conf
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+cp rpm/mongod.sysconfig $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/mongod
+mkdir -p $RPM_BUILD_ROOT%{_var}/lib/mongo
+mkdir -p $RPM_BUILD_ROOT%{_var}/log/mongo
+touch $RPM_BUILD_ROOT%{_var}/log/mongo/mongod.log
 
 %clean
 scons -c
 rm -rf $RPM_BUILD_ROOT
 
 %pre server
-/usr/sbin/useradd -M -r -U -d /var/lib/mongo -s /bin/false \
+%{_sbindir}/useradd -M -r -U -d %{_var}/lib/mongo -s /bin/false \
     -c mongod mongod > /dev/null 2>&1
 
 %post server
