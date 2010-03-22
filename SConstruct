@@ -789,12 +789,10 @@ def doConfigure( myenv , needJava=True , needPcre=True , shell=False ):
 
     if usesm:
 
-        myCheckLib( [ "mozjs" , "libjs", "js", "js_static" ] , True )
+        myCheckLib( [ "mozjs" , "js", "js_static" ] , True )
         mozHeader = "js"
         if bigLibString(myenv).find( "mozjs" ) >= 0:
             mozHeader = "mozjs"
-        elif bigLibString(myenv).find( "libjs" ) >= 0:
-            mozHeader = "js-1.70"
 
         if not conf.CheckHeader( mozHeader + "/jsapi.h" ):
             if conf.CheckHeader( "jsapi.h" ):

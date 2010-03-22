@@ -47,17 +47,10 @@
 
 #else
 
-#if defined( LIBJS )
-#include "js-1.70/jsapi.h"
-#include "js-1.70/jsobj.h"
-#include "js-1.70/jsdate.h"
-#include "js-1.70/jsregexp.h"
-#else
 #include "js/jsapi.h"
 #include "js/jsobj.h"
 #include "js/jsdate.h"
 #include "js/jsregexp.h"
-#endif
 
 #endif
 
