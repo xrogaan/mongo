@@ -1,5 +1,5 @@
 %define name    mongodb
-%define version 1.3.4
+%define version 1.3.5
 %define release %mkrel 1
 
 Name:    %{name}
@@ -72,7 +72,7 @@ scons -c
 rm -rf $RPM_BUILD_ROOT
 
 %pre server
-%{_sbindir}/useradd -M -r -U -d %{_var}/lib/mongo -s /bin/false \
+%{_sbindir}/useradd -M -r -d %{_var}/lib/mongo -s /bin/false \
     -c mongod mongod > /dev/null 2>&1
 
 %post server
