@@ -1,5 +1,5 @@
 %define name    mongodb
-%define version 1.3.5
+%define version 1.4.0
 %define release %mkrel 1
 
 Name:    %{name}
@@ -12,8 +12,12 @@ Group: Databases
 
 Source0: http://downloads.mongodb.org/src/%{name}-src-r%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires: js-devel, readline-devel, boost-devel, pcre-devel
-BuildRequires: gcc-c++, scons
+BuildRequires: js-devel
+BuildRequires: readline-devel
+BuildRequires: boost-devel
+BuildRequires: pcre-devel
+BuildRequires: pcap-devel
+BuildRequires: scons
 
 %description
 Mongo (from "huMONGOus") is a schema-free document-oriented database.
@@ -36,7 +40,7 @@ This package provides the mongo server software, mongo sharding server
 softwware, default configuration files, and init.d scripts.
 
 %package devel
-Summary: Headers and libraries for mongo development. 
+Summary: Headers and libraries for mongo development
 Group: Databases
 
 %description devel
@@ -46,14 +50,15 @@ This package provides the mongo static library and header files needed
 to develop mongo client software.
 
 %prep
-%setup -n %{name}-src-r%{version}
+%setup -qn %{name}-src-r%{version}
 
 %build
-scons --prefix=$RPM_BUILD_ROOT/usr all
-# XXX really should have shared library here
+%scons
 
 %install
-scons --prefix=$RPM_BUILD_ROOT%{_usr} install
+rm -rf %{buildroot}
+
+%scons --prefix=$RPM_BUILD_ROOT%{_usr} install
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
 cp debian/*.1 $RPM_BUILD_ROOT%{_mandir}/man1/
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
@@ -68,30 +73,21 @@ mkdir -p $RPM_BUILD_ROOT%{_var}/log/mongo
 touch $RPM_BUILD_ROOT%{_var}/log/mongo/mongod.log
 
 %clean
-scons -c
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %pre server
-%{_sbindir}/useradd -M -r -d %{_var}/lib/mongo -s /bin/false \
-    -c mongod mongod > /dev/null 2>&1
+%_pre_groupadd mongod
+%_pre_useradd mongod /var/lib/mongo /bin/false
 
 %post server
-if test $1 = 1
-then
-  /sbin/chkconfig --add mongod
-fi
+%_post_service mongod
 
 %preun server
-if test $1 = 0
-then
-  /sbin/chkconfig --del mongod
-fi
+%_preun_service mongod
 
-%postun server
-if test $1 -ge 1
-then
-  /sbin/service mongod stop >/dev/null 2>&1 || :
-fi
+%postun
+%_postun_userdel mongod
+%_postun_groupdel mongod
 
 %files
 %defattr(-,root,root,-)
@@ -104,9 +100,9 @@ fi
 %{_bindir}/mongoimport
 %{_bindir}/mongorestore
 %{_bindir}/mongostat
+%{_bindir}/mongosniff
 
 %{_mandir}/man1/mongo.1*
-%{_mandir}/man1/mongod.1*
 %{_mandir}/man1/mongodump.1*
 %{_mandir}/man1/mongoexport.1*
 %{_mandir}/man1/mongofiles.1*
@@ -116,10 +112,11 @@ fi
 %{_mandir}/man1/mongorestore.1*
 
 %files server
-%defattr(-,root,root,-)
+%defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/mongod.conf
 %{_bindir}/mongod
 %{_bindir}/mongos
+%{_mandir}/man1/mongod.1*
 %{_mandir}/man1/mongos.1*
 %{_sysconfdir}/rc.d/init.d/mongod
 %{_sysconfdir}/sysconfig/mongod
@@ -128,16 +125,16 @@ fi
 %attr(0640,mongod,mongod) %config(noreplace) %verify(not md5 size mtime) %{_var}/log/mongo/mongod.log
 
 %files devel
+%defattr(-, root, root)
 %{_includedir}/mongo
 %{_libdir}/libmongoclient.a
-#%{_libdir}/libmongotestfiles.a
+
 
 %changelog
-* Sun Mar 21 2010 Ludovic Bellière <xrogaan@gmail.com>
-- Update mongo.spec for mandriva packaging
+* Fri Mar 26 2010 Eugeni Dodonov <eugeni@mandriva.com> 1.4.0-1mdv2010.1
++ Revision: 527698
+- Cleanup spec.
+  Add BR on pcap-devel to build mongosniff.
+- Imported into cooker with base on spec from Ludovic Belli?\195?\168re (#58297).
+- Created package structure for mongodb.
 
-* Thu Jan 28 2010 Richard M Kreuter <richard@10gen.com>
-- Minor fixes.
-
-* Sat Oct 24 2009 Joe Miklojcik <jmiklojcik@shopwiki.com> - 
-- Wrote mongo.spec.
